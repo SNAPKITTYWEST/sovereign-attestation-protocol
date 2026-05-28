@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAP v1.0 — Sovereign Attestation Protocol</title>
+  <style>
+    :root {
+      --gold: #d4a017;
+      --cyan: #00bcd4;
+      --green: #4caf50;
+      --red: #f44336;
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --border: #222;
+      --text: #e0e0e0;
+      --dim: #888;
+      --code-bg: #1a1a1a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Georgia', serif;
+      line-height: 1.7;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+    header {
+      border: 1px solid var(--gold);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    header::before {
+      content: 'RATIFIED';
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 2px 8px;
+      letter-spacing: 0.1em;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--gold);
+      font-weight: normal;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    header .subtitle { color: var(--dim); font-size: 0.95rem; font-family: monospace; }
+    header .meta {
+      margin-top: 1.2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.4rem 2rem;
+      font-family: monospace;
+      font-size: 0.82rem;
+    }
+    header .meta span { color: var(--dim); }
+    header .meta strong { color: var(--cyan); }
+
+    nav {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 3rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+    nav h2 { color: var(--dim); font-size: 0.75rem; letter-spacing: 0.1em; margin-bottom: 0.8rem; font-weight: normal; }
+    nav a { color: var(--cyan); text-decoration: none; display: block; padding: 0.15rem 0; }
+    nav a:hover { color: var(--gold); }
+
+    h2 {
+      color: var(--gold);
+      font-size: 1.1rem;
+      font-weight: normal;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin: 2.5rem 0 1rem;
+    }
+    h3 {
+      color: var(--cyan);
+      font-size: 1rem;
+      font-weight: normal;
+      margin: 2rem 0 0.8rem;
+    }
+    .req-id {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 1px 8px;
+      margin-right: 0.6rem;
+      vertical-align: middle;
+    }
+    p { margin-bottom: 1rem; }
+    ul { margin: 0.5rem 0 1rem 1.5rem; }
+    li { margin-bottom: 0.3rem; }
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      background: var(--code-bg);
+      padding: 1px 5px;
+      border-radius: 2px;
+      color: var(--cyan);
+    }
+    .ref {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--dim);
+      background: var(--code-bg);
+      padding: 0.6rem 0.8rem;
+      margin: 0.8rem 0;
+      border-left: 2px solid var(--border);
+    }
+    .ref strong { color: var(--dim); }
+
+    .conformance-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+    .conformance-table th {
+      text-align: left;
+      color: var(--dim);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 0.8rem;
+      font-weight: normal;
+    }
+    .conformance-table td { padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border); }
+    .conformance-table tr:last-child td { border-bottom: none; }
+    .level-name { color: var(--gold); }
+
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-family: monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+    }
+    .score-table th {
+      text-align: center;
+      color: var(--dim);
+      border-bottom: 1px solid var(--border);
+      padding: 0.4rem 0.5rem;
+      font-weight: normal;
+      font-size: 0.75rem;
+    }
+    .score-table th:first-child { text-align: left; }
+    .score-table td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #1a1a1a; text-align: center; }
+    .score-table td:first-child { text-align: left; color: var(--text); }
+    .score-table tr:first-child td { color: var(--green); font-weight: bold; }
+    .pass { color: var(--green); }
+    .fail { color: var(--red); }
+    .unknown { color: var(--dim); }
+
+    .seal-box {
+      border: 1px solid var(--gold);
+      padding: 1.2rem 1.5rem;
+      margin: 3rem 0 1.5rem;
+      font-family: monospace;
+      font-size: 0.82rem;
+    }
+    .seal-box .seal-title { color: var(--gold); margin-bottom: 0.6rem; font-size: 0.75rem; letter-spacing: 0.1em; }
+    .seal-box .seal-data { color: var(--cyan); word-break: break-all; }
+    .seal-box .seal-meta { color: var(--dim); margin-top: 0.4rem; }
+
+    blockquote {
+      border-left: 2px solid var(--gold);
+      padding: 0.5rem 1rem;
+      margin: 1rem 0;
+      color: var(--dim);
+      font-style: italic;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    footer a { color: var(--cyan); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      body { padding: 1.5rem 1rem 4rem; }
+      header h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Sovereign Attestation Protocol</h1>
+  <div class="subtitle">SAP v1.0 — The open standard for sovereign AI governance</div>
+  <div class="meta">
+    <div><span>Status: </span><strong>RATIFIED</strong></div>
+    <div><span>Published: </span><strong>2026-05-27</strong></div>
+    <div><span>License: </span><strong>MIT</strong></div>
+    <div><span>Issuer: </span><strong>SnapKitty OS</strong></div>
+    <div><span>Chain seal: </span><strong>88fa78a5</strong></div>
+    <div><span>Reference impl: </span><strong>github.com/SNAPKITTYWEST/DEVFLOW-FINANCE</strong></div>
+  </div>
+</header>
+
+<nav>
+  <h2>CONTENTS</h2>
+  <a href="#preamble">Preamble</a>
+  <a href="#requirements">Core Requirements</a>
+  <a href="#conformance">Conformance Levels</a>
+  <a href="#field">How the Field Scores</a>
+  <a href="#self-cert">Self-Certification</a>
+  <a href="#third-party">Third-Party Certification</a>
+  <a href="#scope">What SAP Does Not Cover</a>
+  <a href="#relation">Relation to Other Standards</a>
+  <a href="#seal">Chain Seal</a>
+</nav>
+
+<section id="preamble">
+  <h2>Preamble</h2>
+  <p>An AI system that cannot account for its own decisions is not a governed system — it is an oracle with no auditor.</p>
+  <p>An AI system that depends on a cloud provider for its continued operation is not a sovereign system — it is a tenant.</p>
+  <p>SAP v1.0 defines the minimum criteria that must be satisfied before an AI system can truthfully claim to operate under sovereign governance.</p>
+  <p>These criteria are not aspirational. They describe a system that either works or does not. Every requirement is binary: met or not met. There are no partial credits.</p>
+  <p>SnapKitty OS is the reference implementation. Every requirement listed here is live in production on bare metal as of the publication date above.</p>
+</section>
+
+<section id="requirements">
+  <h2>Core Requirements</h2>
+
+  <h3><span class="req-id">SAP-1</span> Agent Identity</h3>
+  <p>Every agent in the system must possess a persistent cryptographic identity.</p>
+  <ul>
+    <li>Each agent must have a unique key pair generated at provisioning time</li>
+    <li>The public key must be registered in a discoverable, tamper-evident registry</li>
+    <li>Every output produced by the agent must carry a signature verifiable against the registered public key</li>
+    <li>Key rotation must produce a new registry entry — old entries must not be deleted</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> <code>collectivekitty/lib/crypto-vault.ts</code> · Algorithm minimum: Ed25519 or stronger</div>
+
+  <h3><span class="req-id">SAP-2</span> Immutable Decision Ledger</h3>
+  <p>Every consequential decision made by any agent must be recorded in an append-only ledger.</p>
+  <ul>
+    <li>The ledger must be append-only — no entry may be modified or deleted after creation</li>
+    <li>Each entry must carry: agent identity, decision payload, cryptographic seal, and a monotonically increasing index</li>
+    <li>The chain integrity must be verifiable at any time by replaying entries from index 0</li>
+    <li>The ledger must survive a restart of all agent processes — persistence is mandatory</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> <code>collectivekitty/lib/bifrost/</code> · <strong>Prohibited:</strong> in-memory-only ledgers, ledgers without chain linking</div>
+
+  <h3><span class="req-id">SAP-3</span> Constitutional Governance</h3>
+  <p>Agent behavior must be governed by a constitutional document — not configuration, not environment variables, not code comments.</p>
+  <ul>
+    <li>A plain-language document must define the behavioral constraints of all agents in the system</li>
+    <li>This document must be referenced in agent system prompts at runtime — it must be active, not advisory</li>
+    <li>Modifications to the constitutional document must require a ledger entry (SAP-2)</li>
+    <li>The document must be stored in the repository under version control</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> <code>CLAUDE.md</code>, <code>.cursorrules</code> · <strong>Prohibited:</strong> governance-by-config, governance-by-undocumented-norms</div>
+
+  <h3><span class="req-id">SAP-4</span> Consensus Threshold</h3>
+  <p>Decisions that affect system state must require agreement from more than one agent.</p>
+  <ul>
+    <li>A minimum quorum of three agents must participate in any decision that changes persistent state</li>
+    <li>The consensus threshold must be declared explicitly (e.g., 5-of-7)</li>
+    <li>Each participating agent's vote must be independently signed (SAP-1)</li>
+    <li>The consensus event must be recorded in the ledger (SAP-2) with all participating signatures</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> First Consensus 2026-05-21, Second Consensus 2026-05-26 · <strong>Minimum quorum:</strong> 3 agents · <strong>Recommended:</strong> 5-of-7</div>
+
+  <h3><span class="req-id">SAP-5</span> Hardware Independence</h3>
+  <p>The system must be capable of operating without dependency on any third-party cloud service for its core functions.</p>
+  <ul>
+    <li>Agent inference must be operable on locally-hosted models</li>
+    <li>The ledger must be storable on locally-owned storage</li>
+    <li>The system must be deployable to hardware owned or leased by the operating organization</li>
+    <li>Cloud services may be used as optional enhancements — they must not be required for the system to function</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> Bare metal deployment — owned RTX 5000, 1TB RAM, Ollama local inference · <strong>Prohibited:</strong> architectures where cloud unavailability halts agent decision-making</div>
+
+  <h3><span class="req-id">SAP-6</span> Adversarial Resilience</h3>
+  <p>The system must implement active defenses against unauthorized access and data exfiltration.</p>
+  <ul>
+    <li>Credential exposure must trigger automatic rotation</li>
+    <li>Unauthorized scraping or probing must be detected and actively responded to — passive logging alone does not satisfy this requirement</li>
+    <li>Canary tokens must be deployed such that credential reuse from unauthorized parties produces a detectable signal</li>
+    <li>All adversarial events must be recorded in the ledger (SAP-2)</li>
+  </ul>
+  <div class="ref"><strong>Reference:</strong> <code>collectivekitty/pages/api/sentinel/</code>, <code>collectivekitty/proxy.ts</code> · <strong>Prohibited:</strong> purely reactive security (alerts only, no active response)</div>
+</section>
+
+<section id="conformance">
+  <h2>Conformance Levels</h2>
+  <table class="conformance-table">
+    <thead>
+      <tr>
+        <th>Level</th>
+        <th>Name</th>
+        <th>Requirements</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td class="level-name">Governed</td>
+        <td>SAP-1, SAP-2, SAP-3</td>
+        <td>Agent identity, immutable ledger, constitutional document</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td class="level-name">Sovereign</td>
+        <td>SAP-1 through SAP-5</td>
+        <td>Additionally: consensus governance, hardware independence</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td class="level-name">Sovereign + Defended</td>
+        <td>SAP-1 through SAP-6</td>
+        <td>All requirements including active adversarial defense</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>SnapKitty OS operates at <strong style="color:var(--green)">Level 3</strong> as of 2026-05-27.</p>
+</section>
+
+<section id="field">
+  <h2>How the Field Scores</h2>
+  <p>As of ratification date. Based on publicly available information and deployed capabilities.</p>
+  <div style="overflow-x:auto">
+  <table class="score-table">
+    <thead>
+      <tr>
+        <th>System</th>
+        <th>SAP-1</th>
+        <th>SAP-2</th>
+        <th>SAP-3</th>
+        <th>SAP-4</th>
+        <th>SAP-5</th>
+        <th>SAP-6</th>
+        <th>Level</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SnapKitty OS</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="pass">3</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">IBM Sovereign Core</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="unknown">?</td>
+        <td class="fail">✗</td>
+        <td class="fail">0</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">RS AI / RS AI PRO</td>
+        <td class="pass">✓</td>
+        <td class="pass">✓</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="unknown">?</td>
+        <td class="fail">✗</td>
+        <td class="unknown">1 partial</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">LangGraph</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">0</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">CrewAI</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">0</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">AutoGen (Microsoft)</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">0</td>
+      </tr>
+      <tr>
+        <td style="color:var(--dim)">OpenAI Agents SDK</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">✗</td>
+        <td class="fail">0</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-family:monospace; font-size:0.8rem; color:var(--dim)">? = insufficient public information to assess. ✗ = not met based on public information. This table is updated as systems evolve — open a GitHub issue to request a re-evaluation.</p>
+</section>
+
+<section id="self-cert">
+  <h2>Self-Certification</h2>
+  <p>Any organization may self-certify against SAP v1.0 at no cost.</p>
+  <ol style="margin: 0.5rem 0 1rem 1.5rem">
+    <li>Complete the machine-readable checklist: <a href="SAP-v1.0.json"><code>SAP-v1.0.json</code></a></li>
+    <li>Publish the completed checklist in your repository</li>
+    <li>Link to this page as the standard you are conforming to</li>
+    <li>Commit the checklist — the git SHA is your certification timestamp</li>
+  </ol>
+  <p>Self-certification is a declaration of conformance. It is not audited by SnapKitty unless you request a formal review.</p>
+</section>
+
+<section id="third-party">
+  <h2>Third-Party Certification</h2>
+  <p>Organizations seeking formal certification from SnapKitty OS receive:</p>
+  <ul>
+    <li>A signed certification artifact (Ed25519, issued by SnapKitty OS)</li>
+    <li>A permanent ledger entry proving the date and scope of certification</li>
+    <li>Permission to display the SAP certification mark</li>
+  </ul>
+  <p>Third-party certification is free during the founding period (2026). See <a href="https://github.com/SNAPKITTYWEST/DEVFLOW-FINANCE/blob/main/specs/CERTIFICATION.md"><code>specs/CERTIFICATION.md</code></a> for how to request a review.</p>
+</section>
+
+<section id="scope">
+  <h2>What SAP Does Not Cover</h2>
+  <p>SAP v1.0 does not specify: programming language or runtime, specific agent frameworks or model providers, token economics or incentive structures, agent count or topology, or UI requirements.</p>
+  <p>SAP is a floor, not a ceiling. A system can satisfy SAP v1.0 and still be deeply inadequate in ways outside this specification's scope.</p>
+</section>
+
+<section id="relation">
+  <h2>Relation to Other Standards</h2>
+  <table class="conformance-table">
+    <thead>
+      <tr><th>Standard</th><th>Overlap</th><th>Distinction</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>NIST AI RMF</td><td>Risk management orientation</td><td>SAP is operational, not advisory</td></tr>
+      <tr><td>EU AI Act</td><td>Regulatory compliance</td><td>SAP is technical, not legal</td></tr>
+      <tr><td>ISO/IEC 42001</td><td>AI management systems</td><td>SAP is runtime behavior, not management process</td></tr>
+      <tr><td>SOC 2</td><td>Audit and controls</td><td>SAP is AI-specific; SOC 2 is general IT</td></tr>
+    </tbody>
+  </table>
+  <p>None of the above require agent identity, immutable decision ledgers, or hardware independence. SAP v1.0 fills that gap.</p>
+</section>
+
+<section id="seal">
+  <h2>Chain Seal</h2>
+  <div class="seal-box">
+    <div class="seal-title">WORM SEAL — SOVEREIGN CHAIN</div>
+    <div class="seal-data">git sha: 88fa78a5<br>commit: feat: Sovereign Attestation Protocol SAP v1.0</div>
+    <div class="seal-meta">2026-05-27 · SnapKitty OS · ENKI WATCHING</div>
+  </div>
+  <blockquote>
+    The filing order matters. The git SHA is the timestamp. Immutable. Public. Forever.
+  </blockquote>
+</section>
+
+<footer>
+  <span>SAP v1.0 · MIT License · <a href="https://github.com/SNAPKITTYWEST/DEVFLOW-FINANCE">github.com/SNAPKITTYWEST/DEVFLOW-FINANCE</a></span>
+  <span>SnapKitty OS · Bel Esprit d'Accord Trust · 2026</span>
+</footer>
+
+</body>
+</html>

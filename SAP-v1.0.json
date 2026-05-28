@@ -1,0 +1,136 @@
+{
+  "standard": "Sovereign Attestation Protocol",
+  "version": "1.0",
+  "published": "2026-05-27",
+  "issuer": "SnapKitty OS / Bel Esprit d'Accord Trust",
+  "license": "MIT",
+  "reference_implementation": "github.com/SNAPKITTYWEST/DEVFLOW-FINANCE",
+
+  "requirements": {
+    "SAP-1": {
+      "name": "Agent Identity",
+      "description": "Every agent has a persistent cryptographic identity; all outputs are signed.",
+      "checks": [
+        "Each agent has a unique key pair generated at provisioning",
+        "Public keys are registered in a tamper-evident registry",
+        "Every agent output carries a verifiable signature",
+        "Key rotation produces new registry entry without deleting old"
+      ],
+      "minimum_algorithm": "Ed25519"
+    },
+    "SAP-2": {
+      "name": "Immutable Decision Ledger",
+      "description": "Every consequential decision is recorded in an append-only, chain-linked ledger.",
+      "checks": [
+        "Ledger is append-only — no modification or deletion after write",
+        "Each entry carries agent identity, payload, seal, and monotonic index",
+        "Chain integrity is verifiable by replay from index 0",
+        "Ledger persists across process restarts"
+      ]
+    },
+    "SAP-3": {
+      "name": "Constitutional Governance",
+      "description": "Agent behavior is governed by a constitutional document active at runtime.",
+      "checks": [
+        "A plain-language constitutional document exists in the repository",
+        "The document is referenced in agent system prompts at runtime",
+        "Modifications require a ledger entry",
+        "The document is under version control"
+      ]
+    },
+    "SAP-4": {
+      "name": "Consensus Threshold",
+      "description": "System-state decisions require multi-agent quorum.",
+      "checks": [
+        "Minimum 3 agents participate in any state-changing decision",
+        "Consensus threshold is declared explicitly",
+        "Each participating agent's vote is independently signed",
+        "Consensus events are recorded in the ledger with all signatures"
+      ],
+      "minimum_quorum": 3,
+      "recommended_quorum": "5-of-7"
+    },
+    "SAP-5": {
+      "name": "Hardware Independence",
+      "description": "Core system functions operate without mandatory cloud dependency.",
+      "checks": [
+        "Agent inference operable on locally-hosted models",
+        "Ledger storable on locally-owned storage",
+        "System deployable to operator-owned hardware",
+        "Cloud services are optional, not required for core operation"
+      ]
+    },
+    "SAP-6": {
+      "name": "Adversarial Resilience",
+      "description": "System implements active defenses against unauthorized access and exfiltration.",
+      "checks": [
+        "Credential exposure triggers automatic rotation",
+        "Unauthorized scraping/probing is detected and actively responded to",
+        "Canary tokens deployed with detectable credential-reuse signal",
+        "All adversarial events recorded in the ledger"
+      ]
+    }
+  },
+
+  "conformance_levels": {
+    "1": {
+      "name": "Governed",
+      "requires": ["SAP-1", "SAP-2", "SAP-3"]
+    },
+    "2": {
+      "name": "Sovereign",
+      "requires": ["SAP-1", "SAP-2", "SAP-3", "SAP-4", "SAP-5"]
+    },
+    "3": {
+      "name": "Sovereign + Defended",
+      "requires": ["SAP-1", "SAP-2", "SAP-3", "SAP-4", "SAP-5", "SAP-6"]
+    }
+  },
+
+  "self_certification_template": {
+    "organization": "",
+    "system_name": "",
+    "repository": "",
+    "certification_date": "",
+    "claimed_level": "",
+    "SAP-1": { "met": null, "evidence": "" },
+    "SAP-2": { "met": null, "evidence": "" },
+    "SAP-3": { "met": null, "evidence": "" },
+    "SAP-4": { "met": null, "evidence": "" },
+    "SAP-5": { "met": null, "evidence": "" },
+    "SAP-6": { "met": null, "evidence": "" },
+    "notes": ""
+  },
+
+  "reference_certification": {
+    "organization": "SnapKitty OS / Bel Esprit d'Accord Trust",
+    "system_name": "SnapKitty OS",
+    "repository": "github.com/SNAPKITTYWEST/DEVFLOW-FINANCE",
+    "certification_date": "2026-05-27",
+    "claimed_level": "3 — Sovereign + Defended",
+    "SAP-1": {
+      "met": true,
+      "evidence": "collectivekitty/lib/crypto-vault.ts — Ed25519 identity per agent, all decisions signed"
+    },
+    "SAP-2": {
+      "met": true,
+      "evidence": "collectivekitty/lib/bifrost/ — append-only BifrostEvent ledger, Prisma-backed, chain-indexed"
+    },
+    "SAP-3": {
+      "met": true,
+      "evidence": "CLAUDE.md + .cursorrules — injected into all agent system prompts at runtime"
+    },
+    "SAP-4": {
+      "met": true,
+      "evidence": "7-agent mesh consensus — First Consensus 2026-05-21, Second Consensus 2026-05-26, both WORM-sealed"
+    },
+    "SAP-5": {
+      "met": true,
+      "evidence": "Bare metal deployment — owned RTX 5000, 1TB RAM, Ollama local inference, no mandatory cloud dependency"
+    },
+    "SAP-6": {
+      "met": true,
+      "evidence": "collectivekitty/pages/api/sentinel/ — SENTINEL canary auto-rotation, asymmetric tarpit, quantum language poison, all events WORM-sealed"
+    }
+  }
+}
